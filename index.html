@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VACACIONES</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00f5ff;
+    --cyan-dim: #00b8cc;
+    --blue: #0066ff;
+    --purple: #7700ff;
+    --dark: #020812;
+    --darker: #010508;
+    --panel: rgba(0,20,40,0.85);
+    --panel-border: rgba(0,245,255,0.2);
+    --text: #c8f0ff;
+    --text-dim: #6699aa;
+    --green: #00ff88;
+    --orange: #ff8800;
+    --red: #ff2244;
+    --yellow: #ffee00;
+    --glow: 0 0 20px rgba(0,245,255,0.4), 0 0 40px rgba(0,245,255,0.15);
+    --glow-sm: 0 0 10px rgba(0,245,255,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Scan line effect */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px 20px 60px;
+  }
+
+  /* ========= HEADER ========= */
+  header {
+    text-align: center;
+    padding: 40px 0 50px;
+    position: relative;
+  }
+
+  .header-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), var(--cyan), transparent);
+    opacity: 0.4;
+  }
+
+  .title-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 900;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--cyan) 0%, #ffffff 40%, var(--blue) 70%, var(--cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 30px rgba(0,245,255,0.5));
+    animation: titlePulse 4s ease-in-out infinite;
+  }
+
+  @keyframes titlePulse {
+    0%, 100% { filter: drop-shadow(0 0 30px rgba(0,245,255,0.5)); }
+    50% { filter: drop-shadow(0 0 50px rgba(0,245,255,0.8)) drop-shadow(0 0 80px rgba(0,102,255,0.4)); }
+  }
+
+  .title-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.6em;
+    color: var(--cyan-dim);
+    margin-top: 8px;
+    opacity: 0.7;
+  }
+
+  .title-deco {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+  }
+
+  .title-deco span {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--cyan);
+    opacity: 0.5;
+    letter-spacing: 0.2em;
+  }
+
+  .title-deco::before, .title-deco::after {
+    content: '';
+    height: 1px;
+    width: 80px;
+    background: linear-gradient(90deg, transparent, var(--cyan));
+  }
+
+  .title-deco::after { background: linear-gradient(90deg, var(--cyan), transparent); }
+
+  /* ========= LIVE CLOCK ========= */
+  .clock-bar {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 40px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--cyan-dim);
+    letter-spacing: 0.1em;
+  }
+
+  #live-clock {
+    color: var(--cyan);
+    font-size: 1rem;
+    text-shadow: var(--glow-sm);
+  }
+
+  /* ========= TOP PANELS ========= */
+  .top-panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 25px;
+  }
+
+  @media (max-width: 768px) {
+    .top-panels { grid-template-columns: 1fr; }
+  }
+
+  /* ========= PANEL ========= */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0.6;
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid rgba(0,245,255,0.1);
+  }
+
+  .panel-icon {
+    font-size: 1.4rem;
+    filter: drop-shadow(0 0 8px rgba(0,245,255,0.6));
+  }
+
+  .panel-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    text-shadow: var(--glow-sm);
+  }
+
+  .panel-badge {
+    margin-left: auto;
+    background: rgba(0,245,255,0.1);
+    border: 1px solid rgba(0,245,255,0.3);
+    border-radius: 20px;
+    padding: 2px 12px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--cyan);
+  }
+
+  .panel-body {
+    padding: 16px 22px 20px;
+  }
+
+  /* ========= PERSON CARD ========= */
+  .person-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 340px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .person-list::-webkit-scrollbar { width: 4px; }
+  .person-list::-webkit-scrollbar-track { background: rgba(0,245,255,0.05); }
+  .person-list::-webkit-scrollbar-thumb { background: rgba(0,245,255,0.3); border-radius: 2px; }
+
+  .person-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(0,245,255,0.04);
+    border: 1px solid rgba(0,245,255,0.08);
+    border-radius: 3px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .person-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+  }
+
+  .person-card.active::before { background: var(--green); box-shadow: 0 0 10px var(--green); }
+  .person-card.upcoming::before { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
+
+  .person-card:hover {
+    background: rgba(0,245,255,0.08);
+    border-color: rgba(0,245,255,0.2);
+    transform: translateX(3px);
+  }
+
+  .person-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: 'Orbitron', monospace;
+    flex-shrink: 0;
+  }
+
+  .active .person-avatar {
+    background: rgba(0,255,136,0.15);
+    border: 1px solid rgba(0,255,136,0.4);
+    color: var(--green);
+  }
+
+  .upcoming .person-avatar {
+    background: rgba(255,136,0,0.15);
+    border: 1px solid rgba(255,136,0,0.4);
+    color: var(--orange);
+  }
+
+  .person-info { flex: 1; min-width: 0; }
+
+  .person-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.03em;
+  }
+
+  .person-dates {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .person-days {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .active .person-days { color: var(--green); }
+  .upcoming .person-days { color: var(--orange); }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: blink 2s infinite;
+  }
+
+  .active .status-dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .upcoming .status-dot { background: var(--orange); box-shadow: 0 0 6px var(--orange); animation-delay: 0.5s; }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ========= CALENDAR ========= */
+  .calendar-panel { margin-bottom: 25px; }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    padding: 16px 22px 20px;
+  }
+
+  .cal-header {
+    text-align: center;
+    padding: 8px 4px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--cyan-dim);
+    font-weight: 600;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 3px;
+    cursor: default;
+    position: relative;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+  }
+
+  .cal-day.empty { opacity: 0; }
+
+  .cal-day.today {
+    background: rgba(0,245,255,0.15);
+    border-color: var(--cyan);
+    color: var(--cyan);
+    font-weight: 700;
+    box-shadow: var(--glow-sm);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+  }
+
+  .cal-day.holiday {
+    background: rgba(255,34,68,0.1);
+    border-color: rgba(255,34,68,0.4);
+    color: var(--red);
+  }
+
+  .cal-day.holiday::after {
+    content: '●';
+    position: absolute;
+    bottom: 2px;
+    right: 3px;
+    font-size: 0.35rem;
+    color: var(--red);
+  }
+
+  .cal-day.on-vacation {
+    background: rgba(0,255,136,0.08);
+    border-color: rgba(0,255,136,0.25);
+    color: var(--green);
+  }
+
+  .cal-day.weekend {
+    color: var(--text-dim);
+    opacity: 0.6;
+  }
+
+  .cal-day:not(.empty):not(.today):hover {
+    background: rgba(0,245,255,0.06);
+    border-color: rgba(0,245,255,0.15);
+  }
+
+  .cal-month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px 0;
+  }
+
+  .cal-month-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--cyan);
+    text-shadow: var(--glow-sm);
+    text-transform: uppercase;
+  }
+
+  .cal-nav-btn {
+    background: rgba(0,245,255,0.08);
+    border: 1px solid rgba(0,245,255,0.2);
+    border-radius: 3px;
+    color: var(--cyan);
+    padding: 5px 14px;
+    cursor: pointer;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
+  }
+
+  .cal-nav-btn:hover {
+    background: rgba(0,245,255,0.18);
+    box-shadow: var(--glow-sm);
+  }
+
+  .holiday-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10,20,35,0.97);
+    border: 1px solid rgba(255,34,68,0.4);
+    border-radius: 3px;
+    padding: 5px 10px;
+    font-size: 0.6rem;
+    color: var(--red);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 100;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .cal-day.holiday:hover .holiday-tooltip { opacity: 1; }
+
+  /* ========= LEGEND ========= */
+  .cal-legend {
+    display: flex;
+    gap: 20px;
+    padding: 0 22px 16px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    border: 1px solid;
+  }
+
+  /* ========= VACATION TABLE ========= */
+  .table-panel { margin-bottom: 40px; }
+
+  .vac-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+
+  .vac-table thead tr {
+    border-bottom: 1px solid rgba(0,245,255,0.2);
+  }
+
+  .vac-table th {
+    padding: 10px 14px;
+    text-align: left;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    color: var(--cyan-dim);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .vac-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(0,245,255,0.04);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    vertical-align: middle;
+  }
+
+  .vac-table tbody tr {
+    transition: all 0.2s;
+  }
+
+  .vac-table tbody tr:hover {
+    background: rgba(0,245,255,0.04);
+  }
+
+  .vac-table tbody tr.row-active {
+    background: rgba(0,255,136,0.06);
+  }
+
+  .vac-table tbody tr.row-active td {
+    color: #9fffcc;
+  }
+
+  .vac-table tbody tr.row-active td:first-child {
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+  }
+
+  .pill-active {
+    background: rgba(0,255,136,0.12);
+    border: 1px solid rgba(0,255,136,0.4);
+    color: var(--green);
+  }
+
+  .pill-upcoming {
+    background: rgba(255,136,0,0.1);
+    border: 1px solid rgba(255,136,0,0.3);
+    color: var(--orange);
+  }
+
+  .pill-past {
+    background: rgba(100,120,150,0.1);
+    border: 1px solid rgba(100,120,150,0.2);
+    color: var(--text-dim);
+  }
+
+  .month-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--cyan-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .days-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--yellow);
+  }
+
+  .row-active .days-num { color: var(--green); }
+
+  /* ========= FOOTER ========= */
+  footer {
+    text-align: center;
+    padding: 30px 0 20px;
+    border-top: 1px solid rgba(0,245,255,0.08);
+    position: relative;
+  }
+
+  .footer-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+  }
+
+  .footer-text span {
+    color: var(--cyan);
+    text-shadow: var(--glow-sm);
+  }
+
+  /* ========= CORNER DECO ========= */
+  .corner-tl, .corner-tr, .corner-bl, .corner-br {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    opacity: 0.5;
+  }
+  .corner-tl { top: 0; left: 0; border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
+  .corner-tr { top: 0; right: 0; border-top: 2px solid var(--cyan); border-right: 2px solid var(--cyan); }
+  .corner-bl { bottom: 0; left: 0; border-bottom: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
+  .corner-br { bottom: 0; right: 0; border-bottom: 2px solid var(--cyan); border-right: 2px solid var(--cyan); }
+
+  /* Table scroll on mobile */
+  .table-scroll { overflow-x: auto; }
+
+  /* Separator line */
+  .sep-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,245,255,0.2), transparent);
+    margin: 25px 0;
+  }
+
+  /* Animate panels in */
+  .panel {
+    animation: fadeInUp 0.6s ease both;
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .top-panels .panel:nth-child(2) { animation-delay: 0.15s; }
+  .calendar-panel { animation-delay: 0.3s; }
+  .table-panel { animation-delay: 0.45s; }
+
+  /* Glitch on title hover */
+  h1:hover {
+    animation: glitch 0.5s step-end;
+  }
+  @keyframes glitch {
+    0% { text-shadow: none; }
+    20% { transform: translate(-2px, 0); }
+    40% { transform: translate(2px, 0); }
+    60% { transform: translate(0, -1px); }
+    80% { transform: translate(0, 1px); }
+    100% { transform: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="title-wrapper">
+      <h1>🏖️ VACACIONES</h1>
+      <p class="title-sub">SISTEMA DE GESTIÓN DE PERSONAL</p>
+      <div class="title-deco">
+        <span>◈ MÓDULO ACTIVO ◈</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- CLOCK BAR -->
+  <div class="clock-bar">
+    <span>📡 SISTEMA ONLINE</span>
+    <span id="live-clock">--:--:--</span>
+    <span id="live-date">---</span>
+    <span>⚡ ACTUALIZACIÓN EN TIEMPO REAL</span>
+  </div>
+
+  <!-- TOP 2 PANELS -->
+  <div class="top-panels">
+
+    <!-- PANEL 1: Currently on vacation -->
+    <div class="panel" id="panel-active">
+      <div class="corner-tl"></div><div class="corner-tr"></div>
+      <div class="corner-bl"></div><div class="corner-br"></div>
+      <div class="panel-header">
+        <span class="panel-icon">🌴</span>
+        <span class="panel-title">De vacaciones ahora</span>
+        <span class="panel-badge" id="badge-active">0</span>
+      </div>
+      <div class="panel-body">
+        <div class="person-list" id="list-active"></div>
+      </div>
+    </div>
+
+    <!-- PANEL 2: Next month vacations -->
+    <div class="panel" id="panel-upcoming">
+      <div class="corner-tl"></div><div class="corner-tr"></div>
+      <div class="corner-bl"></div><div class="corner-br"></div>
+      <div class="panel-header">
+        <span class="panel-icon">📅</span>
+        <span class="panel-title">Próximo mes</span>
+        <span class="panel-badge" id="badge-upcoming">0</span>
+      </div>
+      <div class="panel-body">
+        <div class="person-list" id="list-upcoming"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CALENDAR PANEL -->
+  <div class="panel calendar-panel">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="corner-bl"></div><div class="corner-br"></div>
+    <div class="cal-month-nav">
+      <button class="cal-nav-btn" onclick="changeMonth(-1)">◀ ANTERIOR</button>
+      <div class="cal-month-title" id="cal-month-title">CARGANDO...</div>
+      <button class="cal-nav-btn" onclick="changeMonth(1)">SIGUIENTE ▶</button>
+    </div>
+    <div class="calendar-grid" id="calendar-grid"></div>
+    <div class="cal-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(0,245,255,0.15);border-color:var(--cyan)"></div> HOY</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(255,34,68,0.1);border-color:rgba(255,34,68,0.4)"></div> FESTIVO</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(0,255,136,0.08);border-color:rgba(0,255,136,0.25)"></div> VACACIONES</div>
+    </div>
+  </div>
+
+  <!-- VACATION TABLE -->
+  <div class="panel table-panel">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="corner-bl"></div><div class="corner-br"></div>
+    <div class="panel-header">
+      <span class="panel-icon">📋</span>
+      <span class="panel-title">Planificación de vacaciones 2026</span>
+    </div>
+    <div class="panel-body table-scroll">
+      <table class="vac-table" id="vac-table">
+        <thead>
+          <tr>
+            <th>👤 Operario</th>
+            <th>📅 Inicio</th>
+            <th>🔚 Fin</th>
+            <th>⏱ Días</th>
+            <th>🗓 Mes</th>
+            <th>⚡ Estado</th>
+          </tr>
+        </thead>
+        <tbody id="vac-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p class="footer-text">Web de Javi: <span>_TJ</span></p>
+  </footer>
+
+</div>
+
+<script>
+// ========= DATA =========
+const VACACIONES = [
+  { nombre: "LUIS ALFREDO GUITIAN EXPOSITO",    inicio: "2026-02-09", fin: "2026-02-28", dias: 20, mes: "FEBRERO" },
+  { nombre: "LUIS FRANCISCO ALONSO ÁLVAREZ",    inicio: "2026-03-16", fin: "2026-03-30", dias: 15, mes: "MARZO" },
+  { nombre: "EMILIO MARCOS SANCHEZ",            inicio: "2026-03-01", fin: "2026-03-15", dias: 15, mes: "MARZO" },
+  { nombre: "GERARDO TUERO JUNCO",              inicio: "2026-03-02", fin: "2026-03-31", dias: 30, mes: "MARZO" },
+  { nombre: "VICTORIANO ANCA ROMANO",           inicio: "2026-04-01", fin: "2026-04-30", dias: 30, mes: "ABRIL" },
+  { nombre: "SERGIO VALLE",                     inicio: "2026-04-16", fin: "2026-04-30", dias: 15, mes: "ABRIL" },
+  { nombre: "JUAN LUIS MARTINEZ BLANCO",        inicio: "2026-04-01", fin: "2026-04-15", dias: 15, mes: "ABRIL" },
+  { nombre: "DANIEL LOPEZ CALVO",               inicio: "2026-05-01", fin: "2026-05-15", dias: 15, mes: "MAYO" },
+  { nombre: "RUBEN DARIO GONZALO VIÑAS",        inicio: "2026-05-01", fin: "2026-05-15", dias: 15, mes: "MAYO" },
+  { nombre: "JUAN CARLOS PRIETO BODELON",       inicio: "2026-05-16", fin: "2026-05-30", dias: 15, mes: "MAYO" },
+  { nombre: "MARCOS PEREIRA DO NASCIMIENTO",    inicio: "2026-05-16", fin: "2026-05-30", dias: 15, mes: "MAYO" },
+  { nombre: "JAVIER MENENDEZ GOMEZ",            inicio: "2026-05-31", fin: "2026-06-14", dias: 15, mes: "JUNIO" },
+  { nombre: "LUIS FRANCISCO ALONSO ÁLVAREZ",    inicio: "2026-05-31", fin: "2026-06-14", dias: 15, mes: "JUNIO" },
+  { nombre: "JUAN CARLOS PRIETO BODELON",       inicio: "2026-09-16", fin: "2026-09-30", dias: 15, mes: "SEPTIEMBRE" },
+  { nombre: "MARCOS PEREIRA DO NASCIMIENTO",    inicio: "2026-09-16", fin: "2026-09-30", dias: 15, mes: "SEPTIEMBRE" },
+  { nombre: "EMILIO MARCOS SANCHEZ",            inicio: "2026-10-16", fin: "2026-10-30", dias: 15, mes: "OCTUBRE" },
+  { nombre: "SERGIO VALLE",                     inicio: "2026-10-16", fin: "2026-10-30", dias: 15, mes: "OCTUBRE" },
+  { nombre: "RUBEN DARIO GONZALO VIÑAS",        inicio: "2026-10-01", fin: "2026-10-15", dias: 15, mes: "OCTUBRE" },
+  { nombre: "DANIEL LOPEZ CALVO",               inicio: "2026-10-01", fin: "2026-10-15", dias: 15, mes: "OCTUBRE" },
+  { nombre: "JAVIER TUERO JUNCO",               inicio: "2026-11-03", fin: "2026-12-02", dias: 30, mes: "NOVIEMBRE" },
+  { nombre: "CIPRIAN BAESU",                    inicio: "2026-11-03", fin: "2026-12-02", dias: 30, mes: "NOVIEMBRE" },
+  { nombre: "RUBEN RODRIGUEZ GION",             inicio: "2026-12-01", fin: "2026-12-30", dias: 30, mes: "DICIEMBRE" },
+  { nombre: "LUCIANO SAMPERIO CASO",            inicio: "2026-12-01", fin: "2026-12-30", dias: 30, mes: "DICIEMBRE" },
+  { nombre: "JAVIER MENENDEZ GOMEZ",            inicio: "2026-12-01", fin: "2026-12-15", dias: 15, mes: "DICIEMBRE" },
+  { nombre: "JUAN LUIS MARTINEZ BLANCO",        inicio: "2026-12-16", fin: "2026-12-30", dias: 15, mes: "DICIEMBRE" },
+];
+
+// Festivos Asturias 2026
+const FESTIVOS = {
+  "2026-01-01": "Año Nuevo 🎆",
+  "2026-01-06": "Epifanía del Señor ✨",
+  "2026-04-02": "Jueves Santo ✝️",
+  "2026-04-03": "Viernes Santo ✝️",
+  "2026-05-01": "Fiesta del Trabajo 👷",
+  "2026-08-15": "Asunción de la Virgen 🕊️",
+  "2026-09-08": "Día de Asturias 🏳️",
+  "2026-10-12": "Fiesta Nacional de España 🇪🇸",
+  "2026-11-02": "Festividad de todos los santos 👼",
+  "2026-12-07": "Día de la Constitución 📜",
+  "2026-12-08": "La Inmaculada Concepción 🌸",
+  "2026-12-25": "Natividad del Señor 🎄",
+};
+
+const MESES_ES = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
+const DIAS_ES  = ["LUN","MAR","MIÉ","JUE","VIE","SÁB","DOM"];
+
+// ========= STATE =========
+let calYear, calMonth;
+
+function initCalendar() {
+  const now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
+}
+
+// ========= HELPERS =========
+function parseDate(s) {
+  const [y,m,d] = s.split("-").map(Number);
+  return new Date(y, m-1, d);
+}
+
+function formatDate(s) {
+  const d = parseDate(s);
+  return d.toLocaleDateString("es-ES", {day:"2-digit",month:"2-digit",year:"numeric"});
+}
+
+function pad(n) { return String(n).padStart(2,"0"); }
+
+function dateKey(y,m,d) { return `${y}-${pad(m+1)}-${pad(d)}`; }
+
+function isOnVacation(y,m,d, vac) {
+  const target = new Date(y,m,d);
+  const start = parseDate(vac.inicio);
+  const end   = parseDate(vac.fin);
+  start.setHours(0,0,0,0);
+  end.setHours(23,59,59,999);
+  target.setHours(12,0,0,0);
+  return target >= start && target <= end;
+}
+
+function getInitials(name) {
+  const parts = name.trim().split(" ");
+  return (parts[0][0] + (parts[1] ? parts[1][0] : "")).toUpperCase();
+}
+
+// ========= CLOCK =========
+function updateClock() {
+  const now = new Date();
+  document.getElementById("live-clock").textContent =
+    `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  document.getElementById("live-date").textContent =
+    now.toLocaleDateString("es-ES",{weekday:"long",year:"numeric",month:"long",day:"numeric"}).toUpperCase();
+}
+
+// ========= STATUS PANELS =========
+function buildStatusPanels() {
+  const now = new Date();
+  now.setHours(12,0,0,0);
+  const nextMonthStart = new Date(now.getFullYear(), now.getMonth()+1, 1);
+  const nextMonthEnd   = new Date(now.getFullYear(), now.getMonth()+2, 0);
+
+  const activeList  = [];
+  const upcomingList= [];
+
+  VACACIONES.forEach(vac => {
+    const start = parseDate(vac.inicio);
+    const end   = parseDate(vac.fin);
+    start.setHours(0,0,0,0);
+    end.setHours(23,59,59,999);
+    if (now >= start && now <= end) {
+      activeList.push(vac);
+    } else {
+      // overlaps with next month
+      if (end >= nextMonthStart && start <= nextMonthEnd && now < start) {
+        upcomingList.push(vac);
+      }
+    }
+  });
+
+  renderPersonList("list-active", "badge-active", activeList, "active");
+  renderPersonList("list-upcoming", "badge-upcoming", upcomingList, "upcoming");
+}
+
+function renderPersonList(listId, badgeId, items, type) {
+  const el = document.getElementById(listId);
+  const badge = document.getElementById(badgeId);
+  badge.textContent = items.length;
+  if (items.length === 0) {
+    el.innerHTML = `<div style="text-align:center;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;padding:20px 0;letter-spacing:0.1em">
+      ${type==="active"?"🏖️ NADIE DE VACACIONES AHORA":"📭 SIN REGISTROS MES SIGUIENTE"}
+    </div>`;
+    return;
+  }
+  el.innerHTML = items.map(vac => `
+    <div class="person-card ${type}">
+      <div class="person-avatar">${getInitials(vac.nombre)}</div>
+      <div class="person-info">
+        <div class="person-name">${vac.nombre}</div>
+        <div class="person-dates">📅 ${formatDate(vac.inicio)} → ${formatDate(vac.fin)}</div>
+      </div>
+      <span class="person-days">${vac.dias}d</span>
+      <div class="status-dot"></div>
+    </div>
+  `).join("");
+}
+
+// ========= CALENDAR =========
+function buildCalendar() {
+  const grid = document.getElementById("calendar-grid");
+  const title = document.getElementById("cal-month-title");
+  const now = new Date();
+  const todayKey = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+
+  title.textContent = `${MESES_ES[calMonth]} ${calYear}`;
+
+  // Day headers
+  const headers = DIAS_ES.map(d => `<div class="cal-header">${d}</div>`).join("");
+
+  // First day of month (0=Sun, adjust to Mon=0)
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+
+  let cells = "";
+  for (let i = 0; i < startOffset; i++) {
+    cells += `<div class="cal-day empty"></div>`;
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = dateKey(calYear, calMonth, d);
+    const dayOfWeek = new Date(calYear, calMonth, d).getDay(); // 0=Sun
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+    const isToday = key === todayKey;
+    const isHoliday = !!FESTIVOS[key];
+    const onVac = VACACIONES.some(vac => isOnVacation(calYear, calMonth, d, vac));
+
+    let cls = "cal-day";
+    if (isToday) cls += " today";
+    else if (isHoliday) cls += " holiday";
+    else if (onVac) cls += " on-vacation";
+    else if (isWeekend) cls += " weekend";
+
+    const tooltip = isHoliday ? `<span class="holiday-tooltip">${FESTIVOS[key]}</span>` : "";
+
+    cells += `<div class="${cls}" title="${isHoliday ? FESTIVOS[key] : ''}">${d}${tooltip}</div>`;
+  }
+
+  grid.innerHTML = headers + cells;
+}
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  buildCalendar();
+}
+
+// ========= VACATION TABLE =========
+function buildTable() {
+  const now = new Date();
+  now.setHours(12,0,0,0);
+  const tbody = document.getElementById("vac-tbody");
+
+  tbody.innerHTML = VACACIONES.map(vac => {
+    const start = parseDate(vac.inicio);
+    const end   = parseDate(vac.fin);
+    start.setHours(0,0,0,0);
+    end.setHours(23,59,59,999);
+
+    let statusCls, statusLabel, rowCls = "";
+    if (now >= start && now <= end) {
+      statusCls = "pill-active";
+      statusLabel = "🟢 ACTIVO";
+      rowCls = "row-active";
+    } else if (now < start) {
+      statusCls = "pill-upcoming";
+      statusLabel = "🟠 PRÓXIMO";
+    } else {
+      statusCls = "pill-past";
+      statusLabel = "⚫ PASADO";
+    }
+
+    return `<tr class="${rowCls}">
+      <td>${vac.nombre}</td>
+      <td><span style="font-family:'Share Tech Mono',monospace;font-size:0.72rem">${formatDate(vac.inicio)}</span></td>
+      <td><span style="font-family:'Share Tech Mono',monospace;font-size:0.72rem">${formatDate(vac.fin)}</span></td>
+      <td><span class="days-num">${vac.dias}</span></td>
+      <td><span class="month-tag">${vac.mes}</span></td>
+      <td><span class="status-pill ${statusCls}">${statusLabel}</span></td>
+    </tr>`;
+  }).join("");
+}
+
+// ========= INIT =========
+initCalendar();
+buildStatusPanels();
+buildCalendar();
+buildTable();
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+</body>
+</html>
