@@ -275,6 +275,7 @@
 
   .person-card.active::before { background: var(--green); box-shadow: 0 0 10px var(--green); }
   .person-card.upcoming::before { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
+  .person-card.this-month::before { background: var(--blue); box-shadow: 0 0 10px var(--blue); }
 
   .person-card:hover {
     background: rgba(0,245,255,0.08);
@@ -299,6 +300,13 @@
     background: rgba(0,255,136,0.15);
     border: 1px solid rgba(0,255,136,0.4);
     color: var(--green);
+  }
+
+  
+  .this-month .person-avatar {
+    background: rgba(0,102,255,0.15);
+    border: 1px solid rgba(0,102,255,0.4);
+    color: var(--blue);
   }
 
   .upcoming .person-avatar {
@@ -335,6 +343,7 @@
 
   .active .person-days { color: var(--green); }
   .upcoming .person-days { color: var(--orange); }
+  .this-month .person-days { color: var(--blue); }
 
   .status-dot {
     width: 6px;
@@ -346,6 +355,7 @@
 
   .active .status-dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
   .upcoming .status-dot { background: var(--orange); box-shadow: 0 0 6px var(--orange); animation-delay: 0.5s; }
+  .this-month .status-dot { background: var(--blue); box-shadow: 0 0 6px var(--blue); animation-delay: 1s; }
 
   @keyframes blink {
     0%, 100% { opacity: 1; }
@@ -709,7 +719,7 @@
       <div class="corner-bl"></div><div class="corner-br"></div>
       <div class="panel-header">
         <span class="panel-icon">🌴</span>
-        <span class="panel-title">De vacaciones ahora</span>
+        <span class="panel-title">Vacaciones este mes</span>
         <span class="panel-badge" id="badge-active">0</span>
       </div>
       <div class="panel-body">
@@ -746,7 +756,8 @@
     <div class="cal-legend">
       <div class="legend-item"><div class="legend-dot" style="background:rgba(0,245,255,0.15);border-color:var(--cyan)"></div> HOY</div>
       <div class="legend-item"><div class="legend-dot" style="background:rgba(255,34,68,0.1);border-color:rgba(255,34,68,0.4)"></div> FESTIVO</div>
-      <div class="legend-item"><div class="legend-dot" style="background:rgba(0,255,136,0.08);border-color:rgba(0,255,136,0.25)"></div> VACACIONES</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(0,255,136,0.08);border-color:rgba(0,255,136,0.25)"></div> VACACIONES (activo)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(0,102,255,0.1);border-color:rgba(0,102,255,0.35)"></div> VACACIONES (este mes)</div>
     </div>
   </div>
 
@@ -786,7 +797,7 @@
 // ========= DATA =========
 const VACACIONES = [
   { nombre: "LUIS ALFREDO GUITIAN EXPOSITO",    inicio: "2026-02-09", fin: "2026-02-28", dias: 20, mes: "FEBRERO" },
-  { nombre: "LUIS FRANCISCO ALONSO ÁLVAREZ",    inicio: "2026-03-16", fin: "2026-03-30", dias: 15, mes: "MARZO" },
+  { nombre: "LUIS FRANCISCO ALONSO ÁLVAREZ",    inicio: "2026-03-17", fin: "2026-04-01", dias: 16, mes: "MARZO" },
   { nombre: "EMILIO MARCOS SANCHEZ",            inicio: "2026-03-01", fin: "2026-03-15", dias: 15, mes: "MARZO" },
   { nombre: "GERARDO TUERO JUNCO",              inicio: "2026-03-02", fin: "2026-03-31", dias: 30, mes: "MARZO" },
   { nombre: "VICTORIANO ANCA ROMANO",           inicio: "2026-04-01", fin: "2026-04-30", dias: 30, mes: "ABRIL" },
@@ -883,11 +894,15 @@ function updateClock() {
 function buildStatusPanels() {
   const now = new Date();
   now.setHours(12,0,0,0);
+  const curMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const curMonthEnd   = new Date(now.getFullYear(), now.getMonth()+1, 0);
+  curMonthEnd.setHours(23,59,59,999);
   const nextMonthStart = new Date(now.getFullYear(), now.getMonth()+1, 1);
   const nextMonthEnd   = new Date(now.getFullYear(), now.getMonth()+2, 0);
 
-  const activeList  = [];
-  const upcomingList= [];
+  const activeList    = []; // vacaciones HOY → verde
+  const thisMonthList = []; // vacaciones este mes pero no ahora → azul
+  const upcomingList  = []; // vacaciones el mes que viene → naranja
 
   VACACIONES.forEach(vac => {
     const start = parseDate(vac.inicio);
@@ -896,16 +911,60 @@ function buildStatusPanels() {
     end.setHours(23,59,59,999);
     if (now >= start && now <= end) {
       activeList.push(vac);
-    } else {
-      // overlaps with next month
-      if (end >= nextMonthStart && start <= nextMonthEnd && now < start) {
-        upcomingList.push(vac);
-      }
+    } else if (end >= curMonthStart && start <= curMonthEnd) {
+      // Overlaps current month but not active right now
+      thisMonthList.push(vac);
+    } else if (end >= nextMonthStart && start <= nextMonthEnd && now < start) {
+      upcomingList.push(vac);
     }
   });
 
-  renderPersonList("list-active", "badge-active", activeList, "active");
+  renderActivePanel(activeList, thisMonthList);
   renderPersonList("list-upcoming", "badge-upcoming", upcomingList, "upcoming");
+}
+
+function renderActivePanel(activeList, thisMonthList) {
+  const el = document.getElementById("list-active");
+  const badge = document.getElementById("badge-active");
+  const total = activeList.length + thisMonthList.length;
+  badge.textContent = total;
+
+  if (total === 0) {
+    el.innerHTML = `<div style="text-align:center;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;padding:20px 0;letter-spacing:0.1em">
+      🏖️ NADIE DE VACACIONES AHORA
+    </div>`;
+    return;
+  }
+
+  const activeCards = activeList.map(vac => `
+    <div class="person-card active">
+      <div class="person-avatar">${getInitials(vac.nombre)}</div>
+      <div class="person-info">
+        <div class="person-name">${vac.nombre}</div>
+        <div class="person-dates">📅 ${formatDate(vac.inicio)} → ${formatDate(vac.fin)}</div>
+      </div>
+      <span class="person-days">${vac.dias}d</span>
+      <div class="status-dot"></div>
+    </div>
+  `).join("");
+
+  const thisMonthCards = thisMonthList.length > 0
+    ? `<div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--blue);letter-spacing:0.15em;padding:8px 2px 4px;opacity:0.8">🔵 ESTE MES</div>`
+    + thisMonthList.map(vac => `
+    <div class="person-card this-month">
+      <div class="person-avatar">${getInitials(vac.nombre)}</div>
+      <div class="person-info">
+        <div class="person-name">${vac.nombre}</div>
+        <div class="person-dates">📅 ${formatDate(vac.inicio)} → ${formatDate(vac.fin)}</div>
+      </div>
+      <span class="person-days">${vac.dias}d</span>
+      <div class="status-dot"></div>
+    </div>
+  `).join("") : "";
+
+  el.innerHTML = (activeList.length > 0
+    ? `<div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--green);letter-spacing:0.15em;padding:4px 2px 4px;opacity:0.8">🟢 AHORA</div>` + activeCards
+    : "") + thisMonthCards;
 }
 
 function renderPersonList(listId, badgeId, items, type) {
@@ -914,7 +973,7 @@ function renderPersonList(listId, badgeId, items, type) {
   badge.textContent = items.length;
   if (items.length === 0) {
     el.innerHTML = `<div style="text-align:center;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;padding:20px 0;letter-spacing:0.1em">
-      ${type==="active"?"🏖️ NADIE DE VACACIONES AHORA":"📭 SIN REGISTROS MES SIGUIENTE"}
+      📭 SIN REGISTROS MES SIGUIENTE
     </div>`;
     return;
   }
